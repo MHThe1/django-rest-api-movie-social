@@ -8,3 +8,15 @@ def movie_list(request):
     data = {'movies': list(movies.values()) }
 
     return JsonResponse(data)
+
+
+def movie_details(request, pk):
+    movie = Movie.objects.get(pk=pk)
+    
+    data = {
+        'name': movie.name,
+        'description': movie.description,
+        'active': movie.active
+    }
+
+    return JsonResponse(data)
