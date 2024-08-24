@@ -1,9 +1,10 @@
-from django.urls import path, include
-# from moviemagic_app.api.views import movie_list, movie_details
-from moviemagic_app.api.views import MovieList, MovieDetails
+from django.urls import path
+from moviemagic_app.api.views import WatchListAV, WatchListDetailsAV, StreamPlatformListAV, StreamPlatformDetailsAV
 
 urlpatterns = [
-    path('list/', MovieList.as_view(), name='movie-list'),
-    path('<int:pk>', MovieDetails.as_view(), name='movie-details'),
+    path('list/', WatchListAV.as_view(), name='watch-list'),
+    path('<int:pk>', WatchListDetailsAV.as_view(), name='watch-details'),
+    path('platformlist/', StreamPlatformListAV.as_view(), name='streaming-list'),
+    path('platform/<int:pk>', StreamPlatformDetailsAV.as_view(), name='platform-details'),
 
 ]
