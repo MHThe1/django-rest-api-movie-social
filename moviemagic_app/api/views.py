@@ -1,25 +1,37 @@
+from rest_framework.exceptions import ValidationError
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics, viewsets
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
+from moviemagic_app.api.permissions import IsAdminOrReadOnly, IsReviewerOrReadOnly
 from moviemagic_app.models import WatchList, StreamPlatform, Review
 from moviemagic_app.api.serializers import (WatchListSerializer, StreamPlatformSerializer, 
                                             ReviewSerializer)
 
 class ReviewCreate(generics.CreateAPIView):
     serializer_class = ReviewSerializer
+    queryset = Review.objects.all()
 
     def perform_create(self, serializer):
         pk = self.kwargs.get('pk')
         movie = WatchList.objects.get(pk=pk)
-        serializer.save(watchlist=movie)
+        
+        reviewer_user = self.request.user
+        reviewer_queryset = Review.objects.filter(watchlist=movie, reviewer_user=reviewer_user)
+        
+        if reviewer_queryset.exists():
+            raise ValidationError("You have already reviewed this one!")
+        
+        serializer.save(watchlist=movie, reviewer_user=reviewer_user)
 
         
         
 
 class ReviewList(generics.ListCreateAPIView):
     serializer_class = ReviewSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly]
     
     def get_queryset(self):
         pk = self.kwargs.get('pk')
@@ -29,6 +41,7 @@ class ReviewList(generics.ListCreateAPIView):
 class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    permission_classes = [IsReviewerOrReadOnly]
     
 
 class WatchListAV(APIView):
