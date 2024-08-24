@@ -4,7 +4,8 @@ from moviemagic_app.models import WatchList, StreamPlatform, Review
 class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model = Review
-        fields = "__all__"
+        exclude = ('watchlist',)
+        # fields = "__all__"
 
 class WatchListSerializer(serializers.ModelSerializer):
     reviews = ReviewSerializer(many=True, read_only=True)
@@ -13,7 +14,7 @@ class WatchListSerializer(serializers.ModelSerializer):
         model = WatchList
         fields = "__all__"
         
-class StreamPlatformSerializer(serializers.HyperlinkedModelSerializer):
+class StreamPlatformSerializer(serializers.ModelSerializer):
     watchlist = WatchListSerializer(many=True, read_only=True)
     
     class Meta:
