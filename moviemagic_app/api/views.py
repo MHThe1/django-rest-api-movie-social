@@ -4,16 +4,19 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import generics, viewsets
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.throttling import UserRateThrottle, AnonRateThrottle, ScopedRateThrottle
 
 from moviemagic_app.api.permissions import IsAdminOrReadOnly, IsReviewerOrReadOnly
 from moviemagic_app.models import WatchList, StreamPlatform, Review
 from moviemagic_app.api.serializers import (WatchListSerializer, StreamPlatformSerializer, 
                                             ReviewSerializer)
+from moviemagic_app.api.throttling import ReviewRateThrottle, ReviewListThrottle
 
 class ReviewCreate(generics.CreateAPIView):
-    serializer_class = ReviewSerializer
+    serializer_class = ReviewSerializer  
     queryset = Review.objects.all()
     permission_classes = [IsAuthenticated]
+    throttle_classes = [ReviewRateThrottle]
 
     def perform_create(self, serializer):
         pk = self.kwargs.get('pk')
@@ -41,6 +44,8 @@ class ReviewCreate(generics.CreateAPIView):
 class ReviewList(generics.ListCreateAPIView):
     serializer_class = ReviewSerializer
     # permission_classes = [IsAuthenticated]
+    throttle_classes = [ReviewListThrottle, AnonRateThrottle]
+    
     
     def get_queryset(self):
         pk = self.kwargs.get('pk')
@@ -51,6 +56,9 @@ class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [IsReviewerOrReadOnly]
+    # throttle_classes = [UserRateThrottle, AnonRateThrottle]
+    throttle_classes = [ScopedRateThrottle]
+    throttle_scope = 'review-detail'
     
 
 class WatchListAV(APIView):
