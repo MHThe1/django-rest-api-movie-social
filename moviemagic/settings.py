@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'moviemagic_app',
     'rest_framework',
     'rest_framework.authtoken',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -146,12 +147,19 @@ REST_FRAMEWORK = {
     ],
     
     'DEFAULT_THROTTLE_RATES': {
-        'anon': '5/day',
-        'user': '10/day',
+        'anon': '500/day',
+        'user': '1000/day',
         'review-create': '1/day',
         'review-list': '10/day',
         'review-detail': '2/day',
-    }
+    },
+    
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
+    # 'PAGE_SIZE': 5,
+    
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
 }
 
 # SIMPLE_JWT = {
