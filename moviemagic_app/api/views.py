@@ -13,6 +13,7 @@ from moviemagic_app.api.serializers import (WatchListSerializer, StreamPlatformS
 class ReviewCreate(generics.CreateAPIView):
     serializer_class = ReviewSerializer
     queryset = Review.objects.all()
+    permission_classes = [IsAuthenticated]
 
     def perform_create(self, serializer):
         pk = self.kwargs.get('pk')
@@ -39,7 +40,7 @@ class ReviewCreate(generics.CreateAPIView):
 
 class ReviewList(generics.ListCreateAPIView):
     serializer_class = ReviewSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     
     def get_queryset(self):
         pk = self.kwargs.get('pk')
@@ -53,6 +54,7 @@ class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
     
 
 class WatchListAV(APIView):
+    permission_classes = [IsAdminOrReadOnly]
     
     def get(self, request):
         movies = WatchList.objects.all()
@@ -70,6 +72,8 @@ class WatchListAV(APIView):
 
 
 class WatchListDetailsAV(APIView):
+    permission_classes = [IsAdminOrReadOnly]
+    
     
     def get(self, request, pk):
         try:
@@ -97,6 +101,8 @@ class WatchListDetailsAV(APIView):
 
 
 class StreamPlatformVS(viewsets.ModelViewSet):
+    permission_classes = [IsAdminOrReadOnly]
+    
     queryset = StreamPlatform.objects.all()
     serializer_class = StreamPlatformSerializer
 
